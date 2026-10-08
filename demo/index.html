@@ -437,6 +437,15 @@ i.t:empty{width:12px;height:12px}
 .pcal .day.ag.sel .sm,.pcal .day.ag.sel .dn{color:var(--on-accent)!important}
 #payPrev{display:block;line-height:1.6}
 
+/* redes sociales */
+.soc{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.soc a{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(255,255,255,.4);color:#fff;transition:background .15s,color .15s,border-color .15s}
+.soc a:hover,.soc a:focus-visible{background:var(--dorado);color:var(--marino);border-color:var(--dorado)}
+.soc a:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.soc .ic{width:22px;height:22px}
+.soc.prev{background:var(--marino);padding:14px;border-radius:16px;width:fit-content;max-width:100%;margin-top:0}
+.hint a{color:var(--prim);word-break:break-all}
+
 </style>
 </head>
 <body>
@@ -502,7 +511,12 @@ const IC={
  lock:'<rect x="5" y="11" width="14" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
  snow:'<path d="M12 3v18M4 7.5l16 9M20 7.5l-16 9"/>',
  users:'<circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20a7 7 0 0 1 14 0M16 14.5a5 5 0 0 1 6 5"/>',
- pin:'<path d="M9 3h6l-1 6 3 3H7l3-3z"/><path d="M12 12v9"/>'
+ pin:'<path d="M9 3h6l-1 6 3 3H7l3-3z"/><path d="M12 12v9"/>',
+ instagram:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+ facebook:'<path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8.5a.5.5 0 0 1 .5-.5z"/>',
+ tiktok:'<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.6 2 4.2 5 4.5"/>',
+ youtube:'<rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10.5 9.5v5l4.5-2.5z"/>',
+ xsocial:'<path d="M4 4l16 16"/><path d="M20 4l-6.5 7M10.5 13L4 20"/>'
 };
 const ico=(n,cls)=>'<svg class="ic'+(cls?' '+cls:'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(IC[n]||'')+'</svg>';
 
@@ -529,7 +543,8 @@ const CFG={
  debito:{pct:5},
  fotos:{dias:15,recordar:3},recaptura:{on:true,dias:45},
  avisos:{saldoOn:true,saldoDias:7,segundoOn:true,segundoDias:2,pctOn:true,pct:30,pctDias:30,cambioDias:45,instrOn:true,instrDias:3,resenaOn:true},
- direccion:'Padre Cerqueira 230, Resistencia, Chaco'
+ direccion:'Padre Cerqueira 230, Resistencia, Chaco',
+ redes:{instagram:'@bentom.demo',facebook:'bentom.demo',tiktok:'',youtube:'',x:''}
 };
 const COMBOS=[
  {id:'c1',n:'Combo 1',tag:'Para arrancar la fiesta',hereda:null,items:[
@@ -655,6 +670,29 @@ const pillE=e=>'<span class="pill '+ESTADO[e][1]+'">'+ESTADO[e][0]+'</span>';
 const vence=ev=>new Date(new Date(ev.creado).getTime()+CFG.sena.horas*36e5);
 const recargo=(base,pct)=>Math.round(base*pct/100);
 const nameOf=ev=>ev.padre.n+' '+ev.padre.a;
+/* ---------- redes sociales (las carga el dueño) ---------- */
+const REDES=[
+ {k:'instagram',n:'Instagram',ic:'instagram',base:'https://www.instagram.com/',hosts:['instagram.com'],ph:'@bentom'},
+ {k:'facebook',n:'Facebook',ic:'facebook',base:'https://www.facebook.com/',hosts:['facebook.com','fb.com','fb.me'],ph:'bentom'},
+ {k:'tiktok',n:'TikTok',ic:'tiktok',base:'https://www.tiktok.com/@',hosts:['tiktok.com'],ph:'@bentom'},
+ {k:'youtube',n:'YouTube',ic:'youtube',base:'https://www.youtube.com/@',hosts:['youtube.com','youtu.be'],ph:'@bentom'},
+ {k:'x',n:'X (Twitter)',ic:'xsocial',base:'https://x.com/',hosts:['x.com','twitter.com'],ph:'@bentom'}
+];
+/* Acepta @usuario, usuario o el enlace del perfil. Solo devuelve https y solo del dominio de esa red; si no, ''. */
+function redUrl(r,v){
+ v=String(v||'').trim();if(!v||v.length>200)return '';
+ const h=v.replace(/^@/,'');
+ if(!/[\/:]/.test(v)&&!r.hosts.some(x=>h.toLowerCase().includes(x)))return /^[A-Za-z0-9._-]{1,60}$/.test(h)?r.base+h:'';
+ let u;try{u=new URL(/^https?:\/\//i.test(v)?v:'https://'+v)}catch(e){return ''}
+ if((u.protocol!=='https:'&&u.protocol!=='http:')||u.username||u.password)return '';
+ if(!r.hosts.includes(u.hostname.toLowerCase().replace(/^(www|m|web|mobile)\./,'')))return '';
+ u.protocol='https:';return u.href;
+}
+const redesOn=()=>REDES.map(r=>({r,u:redUrl(r,CFG.redes[r.k])})).filter(x=>x.u);
+function socHtml(prev){
+ const l=redesOn();if(!l.length)return '';
+ return '<div class="soc'+(prev?' prev':'')+'">'+l.map(x=>'<a href="'+esc(x.u)+'" target="_blank" rel="noopener noreferrer" aria-label="'+x.r.n+' de BenTom (se abre en una pestaña nueva)" title="'+x.r.n+'">'+ico(x.r.ic)+'</a>').join('')+'</div>';
+}
 const waLink=(num,txt)=>'https://wa.me/'+String(num).replace(/\D/g,'')+'?text='+encodeURIComponent(txt);
 let evSeq=431;
 /* ---------- credito del desarrollador ---------- */
@@ -720,6 +758,7 @@ function footer(){
  '<div><h4>BenTom</h4><p>Universo de Aventuras. Salón exclusivo para festejos infantiles, con animador, cocina equipada y todo listo para que los chicos jueguen.</p></div>'+
  '<div><h4>Dónde estamos</h4><p>'+esc(CFG.direccion)+'</p><p style="margin-top:8px"><a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(CFG.direccion)+'" target="_blank" rel="noopener" style="color:var(--dorado);font-weight:600">Cómo llegar</a></p></div>'+
  '<div><h4>Reservas</h4><p>WhatsApp: '+esc(CFG.sena.wa)+'</p><p>'+esc(CFG.sena.mail)+'</p><p class="muted" style="margin-top:6px;font-size:.78rem">Datos de contacto de ejemplo.</p></div>'+
+ (redesOn().length?'<div><h4>Seguinos</h4><p>Mirá fotos de los festejos y las novedades.</p>'+socHtml()+'</div>':'')+
  '<div><h4>Para el cliente</h4><ul><li><button class="link" style="color:#fff" data-act="go" data-v="reservar">Reservar un turno</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="cuenta">Ver mi reserva y mi saldo</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="faq">Preguntas frecuentes</button></li></ul></div></div>'+
  '<div class="legal">Demo de diseño. Los textos legales, precios y datos de contacto son de ejemplo y los define el dueño.</div></footer>';
 }
@@ -743,7 +782,7 @@ const TUT={
  ficha:['Cómo registrar un pago',[['wallet','Elegí el concepto y el medio','Seña, refuerzo o pago final. Efectivo, transferencia o tarjeta.'],['card','Si es tarjeta','Elegí la tarjeta y las cuotas. El recargo se calcula y se muestra siempre al cliente.'],['receipt','Generá el recibo','El saldo se actualiza solo. Si cargaste algo mal, anulá el pago con un motivo: no se borra.']]],
  servicios:['Cómo armar la lista para el staff',[['calendar','Elegí el mes','Ves todos los servicios de ese mes.'],['star','Filtrá por servicio','Por ejemplo pinta caritas o fotógrafo, para pasarle sus fechas a cada persona.'],['copy','Copiá y compartí','El texto sale listo para pegar en WhatsApp, sin datos de contacto de las familias.']]],
  ingresos:['Cómo leer los ingresos',[['chart','Elegí el mes','Ves lo cobrado por tipo de pago y por forma de pago.'],['card','Recargos de tarjeta','Se muestran aparte: son un costo de financiación, no parte del precio.']]],
- config:['Cómo cambiar la configuración',[['gear','Elegí la sección','Seña, turnos, precios, tarjetas, reglas y mensajes.'],['edit','Cambiá y listo','Los cambios se ven enseguida en el sitio. Los eventos ya reservados conservan lo que se acordó.']]]
+ config:['Cómo cambiar la configuración',[['gear','Elegí la sección','Seña, turnos, precios, tarjetas, redes sociales, reglas y mensajes.'],['edit','Cambiá y listo','Los cambios se ven enseguida en el sitio. Los eventos ya reservados conservan lo que se acordó.']]]
 };
 function tut(k){const t=TUT[k];if(!t)return;modal(t[0],'<div class="stack">'+t[1].map(s=>'<div class="tut-step"><div class="tut-ic">'+ico(s[0])+'</div><div><b>'+esc(s[1])+'</b><p>'+esc(s[2])+'</p></div></div>').join('')+'</div><button class="btn" data-act="close">Entendido</button>')}
 const helpBtn=k=>'<button class="btn sm suave" data-act="tut" data-v="'+k+'">'+ico('help')+' Cómo se usa</button>';
@@ -1210,9 +1249,10 @@ function vEventos(){
  if(S.ficha&&evById(S.ficha))return vFicha(evById(S.ficha));
  const q=S.evq.trim().toLowerCase();
  const l=EV.filter(e=>(!q||(nameOf(e)+' '+e.cumple.n+' '+e.id).toLowerCase().includes(q))&&(S.evf==='todos'||(S.evf==='saldo'&&e.estado==='confirmada'&&saldo(e)>0)||(S.evf==='conf'&&e.estado==='confirmada'))).sort((a,b)=>a.fecha.localeCompare(b.fecha));
- return pHead('Eventos','eventos')+'<div class="pc"><div class="f-grid" style="margin-bottom:12px"><div class="field"><label for="evq">Buscar</label><input id="evq" type="search" data-in="evq" data-live="evq" value="'+esc(S.evq)+'" placeholder="Nombre, cumpleañero o código"></div><div class="field"><label for="evf">Mostrar</label><select id="evf" data-in="evf" data-render><option value="todos"'+(S.evf==='todos'?' selected':'')+'>Todos</option><option value="conf"'+(S.evf==='conf'?' selected':'')+'>Confirmados</option><option value="saldo"'+(S.evf==='saldo'?' selected':'')+'>Con saldo pendiente</option></select></div></div><div id="evList">'+evRows(l)+'</div></div>';
+ return pHead('Eventos','eventos')+'<div class="pc"><div class="f-grid" style="margin-bottom:12px"><div class="field"><label for="evq">Buscar</label><input id="evq" type="search" data-in="evq" data-live="evq" value="'+esc(S.evq)+'" placeholder="Nombre, cumpleañero o código"></div><div class="field"><label id="evfL">Mostrar</label><div class="row" id="evfChips" role="group" aria-labelledby="evfL">'+[['todos','Todos'],['conf','Confirmados'],['saldo','Con saldo pendiente']].map(x=>'<button type="button" class="chip" data-act="evf" data-v="'+x[0]+'" aria-pressed="'+(S.evf===x[0])+'">'+x[1]+'</button>').join('')+'</div></div></div><div id="evList">'+evRows(l)+'</div></div>';
 }
 const evRows=l=>l.length?l.map(e=>'<div class="li"><div class="tx"><b>'+esc(e.cumple.n||'-')+' · '+nameOf(e)+'</b><small>'+esc(fdate(e.fecha))+' · '+esc(hrs(e.fecha,e.turno))+' · '+COMBOS.find(c=>c.id===e.combo).n+' · '+e.id+'</small></div>'+pillE(e.estado)+'<b class="tnum">'+(e.estado==='confirmada'?(saldo(e)>0?'Resta '+money(saldo(e)):'Saldado'):'')+'</b><button class="btn xs suave" data-act="fopen" data-id="'+e.id+'">Abrir ficha</button></div>').join(''):'<p class="muted">No hay eventos que coincidan.</p>';
+ACT.evf=el=>{S.evf=el.dataset.v;$$('#evfChips .chip').forEach(c=>c.setAttribute('aria-pressed',String(c===el)));LIVE.evq()};
 LIVE.evq=()=>{const q=S.evq.trim().toLowerCase();$('#evList').innerHTML=evRows(EV.filter(e=>(!q||(nameOf(e)+' '+e.cumple.n+' '+e.id).toLowerCase().includes(q))&&(S.evf==='todos'||(S.evf==='saldo'&&e.estado==='confirmada'&&saldo(e)>0)||(S.evf==='conf'&&e.estado==='confirmada'))).sort((a,b)=>a.fecha.localeCompare(b.fecha)))};
 function payPreview(){
  const p=S.pay,base=Number(p.monto)||0;const ev=evById(S.ficha);
@@ -1293,8 +1333,14 @@ function vIngresos(){
 const sw=(path,label)=>{const v=path.split('.').slice(1).reduce((o,k)=>o[k],CFG);return '<label class="sw"><input type="checkbox" role="switch" data-in="'+path+'" data-saved '+(v?'checked':'')+'><span>'+label+'</span></label>'};
 const num=(path,label,extra)=>{const v=path.split('.').slice(1).reduce((o,k)=>o[k],CFG);return '<div class="field"><label>'+label+'<input type="number" min="0" inputmode="numeric" data-in="'+path+'" data-num data-saved value="'+esc(v)+'" '+(extra||'')+'></label></div>'};
 const txt=(path,label)=>{const v=path.split('.').slice(1).reduce((o,k)=>o[k],CFG);return '<div class="field"><label>'+label+'<input data-in="'+path+'" data-saved value="'+esc(v)+'"></label></div>'};
+function redHint(r){
+ const v=String(CFG.redes[r.k]||'').trim();if(!v)return 'Vacío: no se muestra en el sitio.';
+ const u=redUrl(r,v);
+ return u?'✓ Se enlaza a <a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(u)+'</a>':'✗ No es un perfil válido de '+esc(r.n)+'. Probá con '+esc(r.ph)+' o pegá el enlace del perfil.';
+}
+LIVE.red=el=>{const r=REDES.find(x=>x.k===el.dataset.k);const h=$('#rv-'+r.k);if(h)h.innerHTML=redHint(r);const p=$('#socPrev');if(p)p.innerHTML=socHtml(true)||'<p class="muted">Todavía no cargaste ninguna red. Cuando cargues una, aparece acá.</p>'};
 function vConfig(){
- const tabs=[['sena','Seña y cuenta'],['turnos','Turnos'],['precios','Precios'],['tarjetas','Tarjetas'],['avisos','Avisos y reglas'],['galeria','Fotos y reseñas'],['seg','Seguridad']];
+ const tabs=[['sena','Seña y cuenta'],['turnos','Turnos'],['precios','Precios'],['tarjetas','Tarjetas'],['avisos','Avisos y reglas'],['galeria','Fotos y reseñas'],['redes','Redes sociales'],['seg','Seguridad']];
  let b='';const t=S.cfgTab;
  if(t==='sena')b='<div class="pc"><div class="pc-h"><h3>Seña y datos de transferencia</h3></div><div class="f-grid">'+num('CFG.sena.monto','Monto de la seña ($)')+num('CFG.sena.horas','Horas para enviar el comprobante')+txt('CFG.sena.titular','Titular de la cuenta')+txt('CFG.sena.banco','Banco')+txt('CFG.sena.cbu','CBU o CVU')+txt('CFG.sena.alias','Alias')+txt('CFG.sena.wa','WhatsApp de BenTom')+txt('CFG.sena.mail','E-mail de reservas')+txt('CFG.direccion','Dirección')+'</div><div class="note info" style="margin-top:12px">'+ico('lock')+'<span>El plazo corre desde que se crea la solicitud y se frena cuando el cliente avisa que envió el comprobante. Cada reserva guarda el monto y los datos de cuenta vigentes al crearse.</span></div></div>';
  if(t==='turnos')b='<div class="pc"><div class="pc-h"><h3>Turnos por día</h3></div><div class="stack">'+CFG.turnos.map((x,i)=>'<div class="q-item" style="flex-direction:column;align-items:stretch"><div class="f-grid"><div class="field"><label>Nombre<input data-in="CFG.turnos.'+i+'.n" data-saved value="'+esc(x.n)+'"></label></div><div class="field"><label>Desde<input type="time" data-in="CFG.turnos.'+i+'.ini" data-saved value="'+x.ini+'"></label></div><div class="field"><label>Hasta<input type="time" data-in="CFG.turnos.'+i+'.fin" data-saved value="'+x.fin+'"></label></div></div><div class="row">'+sw('CFG.turnos.'+i+'.activo','Activo')+'<span class="row" style="gap:6px" role="group" aria-label="Días">'+['L','M','M','J','V','S','D'].map((d,j)=>'<button class="chip" data-act="turnodia" data-i="'+i+'" data-d="'+j+'" aria-pressed="'+x.dias.includes(j)+'">'+d+'</button>').join('')+'</span></div></div>').join('')+'</div><p class="muted" style="font-size:.85rem;margin-top:8px">Si "Hasta" es menor que "Desde", el turno cruza la medianoche (por ejemplo 22:00 a 01:00).</p><div class="f-grid" style="margin-top:14px">'+num('CFG.ingreso','Ingreso antes del turno (min)')+num('CFG.salida','Tiempo para retirarse (min)')+num('CFG.cap.adultos','Capacidad de adultos')+num('CFG.cap.ninos','Capacidad de niños')+num('CFG.hx.min','Hora extra (min)')+num('CFG.hx.aviso','Hora extra en fin de semana: confirmar con (días)')+'</div><div style="margin-top:12px">'+sw('CFG.hx.activo','Ofrecer hora extra')+'</div></div>';
@@ -1302,6 +1348,7 @@ function vConfig(){
  if(t==='tarjetas')b='<div class="cards">'+CFG.tarjetas.map((x,i)=>'<div class="pc"><div class="pc-h"><h3>'+esc(x.n)+'</h3></div>'+x.planes.map((p,j)=>'<div class="f-grid" style="margin-bottom:8px">'+num('CFG.tarjetas.'+i+'.planes.'+j+'.c','Cuotas')+num('CFG.tarjetas.'+i+'.planes.'+j+'.pct','Recargo (%)')+'</div>').join('')+'</div>').join('')+'<div class="pc"><div class="pc-h"><h3>Tarjeta de débito</h3></div>'+num('CFG.debito.pct','Recargo (%)')+'</div></div><div class="note info" style="margin-top:14px">'+ico('info')+'<span>Efectivo y transferencia no tienen recargo. El recargo se aplica solo sobre el importe que abona el cliente, no sobre todo el combo. La seña se abona solo en efectivo o por transferencia. Estos recargos se muestran siempre al cliente: en la tabla de medios de pago, en el simulador y en cada recibo. Los cobros con tarjeta se hacen en el local y solo se guarda el número de cupón.</span></div>';
  if(t==='avisos')b='<div class="cards"><div class="pc"><div class="pc-h"><h3>Avisos automáticos</h3></div><div class="stack">'+sw('CFG.avisos.saldoOn','Aviso de saldo')+num('CFG.avisos.saldoDias','Días antes del evento')+sw('CFG.avisos.segundoOn','Segundo aviso')+num('CFG.avisos.segundoDias','Días antes del evento')+sw('CFG.avisos.pctOn','Aviso del porcentaje mínimo')+num('CFG.avisos.pct','Porcentaje del combo (%)')+num('CFG.avisos.pctDias','Días antes del evento')+sw('CFG.avisos.instrOn','Instrucciones previas')+num('CFG.avisos.instrDias','Días antes del evento')+sw('CFG.avisos.resenaOn','Pedir reseña al día siguiente')+sw('CFG.recaptura.on','Avisarme cuando se acerca el cumple real de un cumpleañero')+num('CFG.recaptura.dias','Días antes del cumple')+num('CFG.fotos.dias','Días que la familia tiene para descargar las fotos')+num('CFG.fotos.recordar','Recordatorio de fotos: días antes de que venza')+'</div></div><div class="pc"><div class="pc-h"><h3>Reglas y cambios</h3></div>'+num('CFG.avisos.cambioDias','Días para cambios sin costo')+'<p class="muted" style="margin-top:12px">Las reglas del salón se escriben una sola vez y se reutilizan en el FAQ, en los combos, en la reserva, en los mails y en la invitación. Si las cambiás acá, cambian en todos lados.</p></div></div>';
  if(t==='galeria')b='<div class="pc"><div class="pc-h"><h3>Fotos del sitio</h3></div><p class="muted" style="font-size:.9rem">Las fotos se muestran tal cual, sin retoques. Podés ocultar las que no quieras.</p><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">'+GAL.map(g=>'<div style="display:flex;flex-direction:column;gap:6px"><img src="'+IMG[g[0]].src+'" alt="'+esc(g[2])+'" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:14px;border:2px solid var(--line);opacity:'+(HID[g[0]]?.35:1)+'"><button class="btn xs suave" data-act="galhide" data-v="'+g[0]+'">'+(HID[g[0]]?'Mostrar':'Ocultar')+'</button></div>').join('')+'</div></div><div class="pc" style="margin-top:18px"><div class="pc-h"><h3>Reseñas</h3></div><p class="muted" style="font-size:.9rem">Solo pueden dejar reseña las familias de eventos ya realizados. Vos decidís cuáles se publican.</p>'+REV.map(r=>'<div class="li"><div class="tx"><b>'+esc(r.n)+' · '+esc(r.ev)+'</b><small>'+esc(r.t)+'</small></div>'+stars(r.r)+'<span class="pill '+(r.est==='aprobada'?'p-ok':'p-warn')+'">'+(r.est==='aprobada'?'Publicada':'Pendiente')+'</span><button class="btn xs suave" data-act="revmod" data-id="'+r.id+'">'+(r.est==='aprobada'?'Ocultar':'Publicar')+'</button></div>').join('')+'</div>';
+ if(t==='redes')b='<div class="pc"><div class="pc-h"><h3>Redes sociales</h3></div><p class="muted" style="font-size:.9rem">Escribí solo el usuario (por ejemplo <b>@bentom</b>) o pegá el enlace del perfil. Lo que dejes vacío no se muestra. Los íconos aparecen en el pie de todas las páginas del sitio.</p><div class="f-grid" style="margin-top:12px">'+REDES.map(r=>'<div class="field"><label for="red-'+r.k+'">'+r.n+'</label><input id="red-'+r.k+'" data-in="CFG.redes.'+r.k+'" data-live="red" data-k="'+r.k+'" data-saved value="'+esc(CFG.redes[r.k])+'" placeholder="'+r.ph+'" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" aria-describedby="rv-'+r.k+'"><p class="hint" id="rv-'+r.k+'" aria-live="polite">'+redHint(r)+'</p></div>').join('')+'</div></div><div class="pc" style="margin-top:18px"><div class="pc-h"><h3>Así se ve en el sitio</h3></div><div id="socPrev">'+(socHtml(true)||'<p class="muted">Todavía no cargaste ninguna red. Cuando cargues una, aparece acá.</p>')+'</div></div><div class="note info" style="margin-top:14px">'+ico('lock')+'<span>Solo se aceptan enlaces seguros (https) de la propia red. Si pegás un enlace de otro sitio, no se publica.</span></div>';
  if(t==='seg')b='<div class="pc"><div class="pc-h"><h3>Seguridad de la versión final</h3></div><ul class="tick-list">'+['Ingreso del dueño con verificación en dos pasos (MFA)','Reglas de acceso por fila en la base de datos: cada familia ve solo lo suyo','Protección anti robots en los formularios (Turnstile)','Los archivos subidos se validan por tipo y tamaño','Enlaces de invitación con códigos largos, que no aparecen en buscadores','Nunca se guarda el número de tarjeta, solo el cupón','El DNI solo lo ve el dueño'].map(x=>'<li>'+ico('lock')+'<span>'+x+'</span></li>').join('')+'</ul></div>';
  return pHead('Configuración','config')+'<div class="tabs" role="tablist">'+tabs.map(x=>'<button class="chip" role="tab" data-act="cfgtab" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>').join('')+'</div>'+b;
 }
