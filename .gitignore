@@ -1,0 +1,22 @@
+# Dependencias y builds
+node_modules/
+.next/
+out/
+dist/
+build/
+.vercel/
+.wrangler/
+
+# Secretos: NUNCA subir
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
