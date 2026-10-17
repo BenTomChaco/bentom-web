@@ -17,6 +17,8 @@ Dominio previsto: **www.bentom.com.ar**.
 - Publicarla como sitio estático apuntando el **directorio de salida** a `demo`
   (Cloudflare Pages o Vercel; sin comando de build).
 
+La demo tiene tres vistas: **Sitio para clientes**, **Panel del dueño** (etapa 1) y **Equipo · próxima etapa**, una vista previa de una etapa posterior con ingreso con Google solo para el personal, paneles por rol (pelotero, cantina y juguetería Ben Toys) y accesos que asigna el administrador.
+
 La demo no se indexa en buscadores (`robots.txt`, `noindex` y cabecera `X-Robots-Tag`).
 
 ## Mantener activo Supabase (plan gratuito)
