@@ -1689,7 +1689,7 @@ function vTienda(){
  const list=vis.filter(p=>E.jcat==='Todos'||p.cat===E.jcat);
  const dest=vis.filter(p=>p.dest);
  const back=E.from==='eq'?'<button class="btn xs suave" data-act="eqback">← Volver al panel del equipo</button>':'<button class="btn xs suave" data-act="go" data-v="inicio">← Volver al inicio</button>';
- return eqNote()+'<div class="eq-store"><div class="wrap"><div class="row" style="justify-content:space-between;margin:14px 0">'+back+'<span class="eq-url">'+ico('lock')+' toys.bentom.com.ar</span></div>'+
+ return '<div class="eq-store"><div class="wrap"><div class="row" style="justify-content:space-between;margin:14px 0">'+back+'<span class="eq-url">'+ico('lock')+' toys.bentom.com.ar</span></div>'+
  '<header class="eq-shead"><img src="'+TOYS_LOGO+'" alt="Ben Toys by BenTom" width="130" height="130"><div><h2>Juguetes para jugar, regalar y festejar</h2><p>Elegí, consultanos por WhatsApp y retiralo en BenTom.</p></div></header>'+
  (dest.length?'<h3 class="eq-h">Destacados</h3><div class="eq-grid">'+dest.map(toyTile).join('')+'</div>':'')+
  '<h3 class="eq-h">Todos los juguetes</h3><div class="chips" style="margin:0 0 14px" role="group" aria-label="Categorías">'+['Todos'].concat(J.cats).map(c=>'<button class="chip" data-act="eqjcat" data-v="'+esc(c)+'" aria-pressed="'+(E.jcat===c)+'">'+esc(c)+'</button>').join('')+'</div>'+
