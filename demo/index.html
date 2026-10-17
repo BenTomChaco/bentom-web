@@ -476,6 +476,7 @@ i.t:empty{width:12px;height:12px}
 .eq-star{position:absolute;top:8px;left:8px;padding:3px 10px;border-radius:99px;background:var(--dorado);color:var(--marino);font-size:.72rem;font-weight:800}
 .tbl select{padding:.5em .6em;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);min-width:120px}
 @media (max-width:700px){.eq-un{display:none}.eq-who{min-width:130px}}
+.eq-toyhead{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.eq-toyhead img{border-radius:50%;background:#fff;border:3px solid var(--ink);flex:none}.eq-toyhead h2{margin:0 0 4px}.eq-toyhead p{margin:0}
 
 </style>
 </head>
@@ -754,7 +755,7 @@ function render(keep){
  tick();
  if(keep)window.scrollTo(0,y);
 }
-function go(page){S.mode='sitio';S.page=page;S.menu=false;S.notif=false;render();window.scrollTo(0,0)}
+function go(page){if(page==='tienda'&&S.eq)S.eq.from=null;S.mode='sitio';S.page=page;S.menu=false;S.notif=false;render();window.scrollTo(0,0)}
 function pgo(pp,id){S.mode='panel';S.pp=pp;if(id)S.ficha=id;S.notif=false;S.menu=false;render();window.scrollTo(0,0)}
 function toast(msg,t){
  const el=document.createElement('div');el.className='toast '+(t||'ok');el.setAttribute('role','status');
@@ -782,7 +783,7 @@ function topbar(){
   const un=unread();
   return '<header class="top"><div class="wrap" style="max-width:1760px">'+logo+'<span class="pill p-info" style="margin-left:6px">Panel del dueño</span><div class="row" style="margin-left:auto;gap:10px"><span class="rel"><button class="icon-btn" data-act="notif" aria-label="Notificaciones, '+un+' sin leer" aria-expanded="'+S.notif+'">'+ico('bell')+(un?'<span class="badge">'+un+'</span>':'')+'</button>'+(S.notif?notifBox():'')+'</span>'+themeBtn()+'<button class="btn sm suave" data-act="mode" data-v="sitio">Ver el sitio</button></div></div></header>';
  }
- const items=[['inicio','Inicio'],['combos','Combos'],['galeria','El salón'],['faq','Preguntas'],['cuenta','Mi reserva']];
+ const items=[['inicio','Inicio'],['combos','Combos'],['galeria','El salón'],['tienda','Ben Toys'],['faq','Preguntas'],['cuenta','Mi reserva']];
  return '<header class="top"><div class="wrap">'+logo+'<button class="icon-btn burger" data-act="menu" aria-label="Menú" aria-expanded="'+S.menu+'">'+ico('menu')+'</button><nav class="nav'+(S.menu?' open':'')+'" aria-label="Principal">'+items.map(i=>'<button class="nl" data-act="go" data-v="'+i[0]+'"'+(S.page===i[0]?' aria-current="page"':'')+'>'+i[1]+'</button>').join('')+'<button class="btn sm" data-act="go" data-v="reservar">Reservar turno</button>'+themeBtn()+'</nav></div></header>';
 }
 function notifBox(){
@@ -795,7 +796,7 @@ function footer(){
  '<div><h4>Dónde estamos</h4><p>'+esc(CFG.direccion)+'</p><p style="margin-top:8px"><a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(CFG.direccion)+'" target="_blank" rel="noopener" style="color:var(--dorado);font-weight:600">Cómo llegar</a></p></div>'+
  '<div><h4>Reservas</h4><p>WhatsApp: '+esc(CFG.sena.wa)+'</p><p>'+esc(CFG.sena.mail)+'</p><p class="muted" style="margin-top:6px;font-size:.78rem">Datos de contacto de ejemplo.</p></div>'+
  (redesOn().length?'<div><h4>Seguinos</h4><p>Mirá fotos de los festejos y las novedades.</p>'+socHtml()+'</div>':'')+
- '<div><h4>Para el cliente</h4><ul><li><button class="link" style="color:#fff" data-act="go" data-v="reservar">Reservar un turno</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="cuenta">Ver mi reserva y mi saldo</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="faq">Preguntas frecuentes</button></li></ul></div></div>'+
+ '<div><h4>Para el cliente</h4><ul><li><button class="link" style="color:#fff" data-act="go" data-v="reservar">Reservar un turno</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="cuenta">Ver mi reserva y mi saldo</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="tienda">Tienda Ben Toys</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="faq">Preguntas frecuentes</button></li></ul></div></div>'+
  '<div class="legal">Demo de diseño. Los textos legales, precios y datos de contacto son de ejemplo y los define el dueño.</div></footer>';
 }
 
@@ -877,7 +878,7 @@ const GAL=[
 const galFig=(g,i,h)=>'<button data-act="lb" data-i="'+i+'" aria-label="Ampliar: '+esc(g[2])+'"><img src="'+IMG[g[0]].src+'" alt="'+esc(g[2])+'" width="'+IMG[g[0]].w+'" height="'+IMG[g[0]].h+'" loading="lazy"></button>';
 function sitio(){
  const p=S.page;
- return ({inicio:pgInicio,combos:pgCombos,reservar:pgReservar,cuenta:pgCuenta,galeria:pgGaleria,faq:pgFaq,invitacion:pgInvitacion}[p]||pgInicio)();
+ return ({inicio:pgInicio,combos:pgCombos,reservar:pgReservar,cuenta:pgCuenta,galeria:pgGaleria,faq:pgFaq,invitacion:pgInvitacion,tienda:vTienda}[p]||pgInicio)();
 }
 const waveSvg=c=>'<svg class="wave top-w" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true" style="color:'+c+'"><path fill="currentColor" d="M0,40 C240,90 480,0 720,40 S1200,80 1440,30 L1440,80 L0,80 Z"/></svg>';
 function proximoLibre(){
@@ -898,6 +899,7 @@ function pgInicio(){
  '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Tres combos, una fiesta a tu medida</h2><p>Todos incluyen turno de 3 hs, salón exclusivo y animador. Precios de '+MESES[8]+'-'+MESES[9]+' 2026, en efectivo.</p></div><div class="combos">'+COMBOS.map(c=>'<article class="combo '+c.id+'"><div class="combo-h"><span class="combo-name">'+c.n+'</span><span class="combo-price tnum">'+money(CFG.precio[c.id])+'</span><span>'+c.tag+'</span></div><div class="combo-b"><p class="muted">'+(c.hereda?'Todo lo del '+COMBOS.find(x=>x.id===c.hereda).n+' y además:':'Lo esencial para una fiesta redonda:')+'</p><ul>'+(c.hereda?c.items:c.items.slice(0,4)).slice(0,5).map(i=>'<li>'+ico('check')+'<span>'+esc(i.split(':')[0])+'</span></li>').join('')+'</ul><button class="btn sm suave" data-act="go" data-v="combos" style="margin-top:auto">Ver todo lo que incluye</button></div></article>').join('')+'</div></div></section>'+
  '<section class="sec"><div class="wrap"><div class="sec-head"><h2>Mirá el salón por dentro</h2><p>Pelotero, trampolines, cancha, Baby Zone y un espacio de mesas para los grandes.</p></div><div class="row" style="flex-wrap:nowrap;overflow-x:auto;padding:6px 6px 18px;gap:16px;scroll-snap-type:x proximity">'+
  GAL.filter(g=>!HID[g[0]]).slice(0,8).map((g,i)=>'<button data-act="lb" data-i="'+i+'" aria-label="Ampliar: '+esc(g[2])+'" style="flex:none;scroll-snap-align:start;padding:0;border:3px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--surface);box-shadow:4px 4px 0 var(--ink);cursor:pointer"><img src="'+IMG[g[0]].src+'" alt="'+esc(g[2])+'" height="260" style="height:260px;width:auto;max-width:none" loading="lazy"></button>').join('')+'</div><button class="btn naranja" data-act="go" data-v="galeria" style="margin-top:8px">Ver toda la galería</button></div></section>'+
+ toysHome()+
  '<section class="sec"><div class="wrap"><div class="sec-head"><h2>Lo que cuentan las familias</h2><p>Reseñas de eventos ya realizados, revisadas por BenTom.</p></div><div class="grid">'+REV.filter(r=>r.est==='aprobada').map(r=>'<figure class="card" style="margin:0"><div>'+stars(r.r)+'</div><blockquote style="margin:8px 0">“'+esc(r.t)+'”</blockquote><figcaption class="muted" style="font-size:.88rem"><b>'+esc(r.n)+'</b> · '+esc(r.ev)+'</figcaption></figure>').join('')+'</div></div></section>'+
  '<section class="sec alt"><div class="wrap"><div class="sec-head"><h2>Preguntas que nos hacen siempre</h2></div><div class="stack">'+faqList().slice(0,4).map(faqItem).join('')+'</div><button class="btn sm suave" style="margin-top:16px" data-act="go" data-v="faq">Ver todas las preguntas</button></div></section>'+
  '<section class="sec"><div class="wrap"><div class="card" style="background:var(--azul);color:#fff;border:3px solid var(--ink);text-align:center;align-items:center;display:flex;flex-direction:column;gap:14px;padding:clamp(26px,5vw,52px)"><h2 style="font-size:clamp(1.8rem,4.5vw,3rem)">¿Ya tenés la fecha en mente?</h2><p style="color:#C9CFF5;max-width:34em">Reservá tu turno online. Cuanto antes transfieras la seña, antes lo confirmamos.</p><button class="btn" data-act="go" data-v="reservar">Reservar mi turno</button></div></div></section>';
@@ -1572,7 +1574,6 @@ function vEquipo(){
  if(!E.u)return vEqLogin();
  const u=eqMe();
  if(u.est!=='activo')return vEqEspera(u);
- if(E.view==='tienda')return vTienda();
  const ps=eqPanels();
  if(!ps.find(x=>x[0]===E.panel))E.panel=ps[0]?ps[0][0]:'pelotero';
  const body={pelotero:vEqPelotero,cantina:vCantina,jug:vJug,acc:vAccesos}[E.panel]();
@@ -1672,17 +1673,27 @@ function vJug(){
  }
  return pHead('Juguetería · Ben Toys','',' <button class="btn sm" data-act="eqtienda">Ver la tienda pública</button>')+'<div class="tabs" role="tablist">'+tabs.map(x=>'<button class="chip" role="tab" data-act="eqtab" data-p="jug" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>').join('')+'</div>'+b;
 }
+const toyWa=p=>'https://wa.me/'+eqDigits(S.eq.jug.wa)+'?text='+encodeURIComponent(S.eq.jug.msg+p.n);
+const toyTile=(p,i)=>'<article class="eq-tile"><div class="eq-art" style="background:'+TOYS_I[i%TOYS_I.length]+'">'+ico('gift')+(p.dest?'<span class="eq-star">Destacado</span>':'')+'</div><h3>'+esc(p.n)+'</h3><b class="tnum">'+money(p.precio)+'</b><small class="muted">'+(p.stock<=0?'Sin stock por ahora':p.stock<=3?'¡Últimas unidades!':'Disponible')+'</small><a class="btn xs" target="_blank" rel="noopener noreferrer" href="'+toyWa(p)+'">'+ico('wa')+' Consultar por WhatsApp</a></article>';
+const toyDest=()=>S.eq.jug.prod.filter(p=>p.on&&p.dest);
+/* seccion de la portada del pelotero con destacados de la jugueteria */
+function toysHome(){
+ const d=toyDest().slice(0,4);
+ return '<section class="sec alt"><div class="wrap"><div class="eq-toyhead"><img src="'+TOYS_LOGO+'" alt="Ben Toys by BenTom" width="96" height="96"><div><h2>Ben Toys, la juguetería de BenTom</h2><p>Regalos y juguetes para llevarte después del festejo. Algunos destacados:</p></div></div>'+
+ (d.length?'<div class="eq-grid">'+d.map(toyTile).join('')+'</div>':'')+
+ '<div class="row" style="margin-top:18px"><button class="btn naranja" data-act="go" data-v="tienda">Ir a la tienda</button><span class="pill p-info">Vista previa de la próxima etapa</span></div></div></section>';
+}
+/* pagina publica de la tienda (dentro del sitio del pelotero) */
 function vTienda(){
  const E=S.eq,J=E.jug,vis=J.prod.filter(p=>p.on);
  const list=vis.filter(p=>E.jcat==='Todos'||p.cat===E.jcat);
- const wa=p=>'https://wa.me/'+eqDigits(J.wa)+'?text='+encodeURIComponent(J.msg+p.n);
- const tile=(p,i)=>'<article class="eq-tile"><div class="eq-art" style="background:'+TOYS_I[i%TOYS_I.length]+'">'+ico('gift')+(p.dest?'<span class="eq-star">Destacado</span>':'')+'</div><h3>'+esc(p.n)+'</h3><b class="tnum">'+money(p.precio)+'</b><small class="muted">'+(p.stock<=0?'Sin stock por ahora':p.stock<=3?'¡Últimas unidades!':'Disponible')+'</small><a class="btn xs" target="_blank" rel="noopener noreferrer" href="'+wa(p)+'">'+ico('wa')+' Consultar por WhatsApp</a></article>';
  const dest=vis.filter(p=>p.dest);
- return '<div class="eq-store"><div class="wrap"><div class="row" style="justify-content:space-between;margin:14px 0"><button class="btn xs suave" data-act="eqback">← Volver al panel</button><span class="eq-url">'+ico('lock')+' toys.bentom.com.ar</span></div>'+
+ const back=E.from==='eq'?'<button class="btn xs suave" data-act="eqback">← Volver al panel del equipo</button>':'<button class="btn xs suave" data-act="go" data-v="inicio">← Volver al inicio</button>';
+ return eqNote()+'<div class="eq-store"><div class="wrap"><div class="row" style="justify-content:space-between;margin:14px 0">'+back+'<span class="eq-url">'+ico('lock')+' toys.bentom.com.ar</span></div>'+
  '<header class="eq-shead"><img src="'+TOYS_LOGO+'" alt="Ben Toys by BenTom" width="130" height="130"><div><h2>Juguetes para jugar, regalar y festejar</h2><p>Elegí, consultanos por WhatsApp y retiralo en BenTom.</p></div></header>'+
- (dest.length?'<h3 class="eq-h">Destacados</h3><div class="eq-grid">'+dest.map(tile).join('')+'</div>':'')+
+ (dest.length?'<h3 class="eq-h">Destacados</h3><div class="eq-grid">'+dest.map(toyTile).join('')+'</div>':'')+
  '<h3 class="eq-h">Todos los juguetes</h3><div class="chips" style="margin:0 0 14px" role="group" aria-label="Categorías">'+['Todos'].concat(J.cats).map(c=>'<button class="chip" data-act="eqjcat" data-v="'+esc(c)+'" aria-pressed="'+(E.jcat===c)+'">'+esc(c)+'</button>').join('')+'</div>'+
- '<div class="eq-grid">'+(list.length?list.map(tile).join(''):'<p class="muted">No hay productos en esta galería.</p>')+'</div><p class="hint" style="margin:24px 0 40px">Los productos, precios, destacados y galerías los maneja el equipo desde su panel.</p></div></div>';
+ '<div class="eq-grid">'+(list.length?list.map(toyTile).join(''):'<p class="muted">No hay productos en esta galería.</p>')+'</div><p class="hint" style="margin:24px 0 40px">Los productos, precios, destacados y galerías los maneja el equipo desde su panel.</p></div></div>';
 }
 
 /* ---- accesos (solo administrador) ---- */
@@ -1731,8 +1742,8 @@ Object.assign(ACT,{
  eqsaveprod(){const n=$('#np-n').value.trim(),pr=Number($('#np-p').value)||0;if(!n||!pr){toast('Completá el nombre y el precio.','warn');return}
   S.eq.cant.prod.push({id:'p'+Date.now(),n,cat:'Otros',costo:Number($('#np-c').value)||0,precio:pr,stock:Number($('#np-s').value)||0,min:Number($('#np-m').value)||0,prov:$('#np-v').value,on:true});eqLog('Agregó el producto '+n+' a la cantina');closeLayer();toast('Producto agregado.','ok');render(true)},
  /* jugueteria */
- eqtienda(){S.eq.view='tienda';render();window.scrollTo(0,0)},
- eqback(){S.eq.view='panel';render();window.scrollTo(0,0)},
+ eqtienda(){S.eq.from='eq';S.mode='sitio';S.page='tienda';render();window.scrollTo(0,0)},
+ eqback(){S.eq.from=null;S.mode='equipo';S.eq.view='panel';render();window.scrollTo(0,0)},
  eqjcat(el){S.eq.jcat=el.dataset.v;render(true)},
  eqjprice(el){const p=S.eq.jug.prod[Number(el.dataset.i)];p.precio=Math.max(0,Number(el.value)||0);eqLog('Cambió el precio de '+p.n);toast('Cambio guardado. Ya se ve en la tienda.','ok');render(true)},
  eqjdest(el){const p=S.eq.jug.prod[Number(el.dataset.i)];p.dest=el.checked;eqLog((p.dest?'Destacó ':'Quitó de destacados ')+p.n);toast(p.dest?'Ahora aparece en Destacados.':'Ya no está en Destacados.','ok');render(true)},
