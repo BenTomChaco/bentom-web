@@ -804,7 +804,7 @@ function modal(title,body,wide){
 
 /* ---------- encabezados ---------- */
 function demoBar(){
- return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="vercantina" aria-pressed="'+(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina')+'">Cantina</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo'&&!(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina'))+'">Equipo</button></span></div></div>';
+ return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="vercantina" aria-pressed="'+(S.mode==='equipo'&&S.eq.via==='cantina')+'">Cantina</button><button data-act="verequipo" aria-pressed="'+(S.mode==='equipo'&&!(S.mode==='equipo'&&S.eq.via==='cantina'))+'">Equipo</button></span></div></div>';
 }
 function themeBtn(){return '<button class="icon-btn" data-act="theme" aria-label="Cambiar a modo '+(isDark()?'claro':'oscuro')+'">'+ico(isDark()?'sun':'moon')+'</button>'}
 function topbar(){
@@ -1771,8 +1771,9 @@ function vAccesos(){
 Object.assign(ACT,{
  eqgoogle(){toast('En el sitio real se abre Google para elegir tu cuenta. En la demo, elegí con quién ingresar abajo.','info')},
  eqlogin(el){S.eq.u=el.dataset.u;S.eq.view='panel';const u=eqMe();if(u.est==='activo'){const p=eqPanels()[0];S.eq.panel=p?p[0]:'pelotero';S.eq.tab={cantina:'ventas',jug:'productos'}}render();window.scrollTo(0,0)},
- eqlogout(){S.eq.u=null;S.eq.view='panel';S.eq.cart={};render();window.scrollTo(0,0)},
- vercantina(){S.mode='equipo';S.eq.from=null;S.eq.u='u3';S.eq.view='panel';S.eq.panel='cantina';S.eq.tab.cantina='ventas';S.menu=false;render();window.scrollTo(0,0)},
+ eqlogout(){S.eq.via=null;S.eq.u=null;S.eq.view='panel';S.eq.cart={};render();window.scrollTo(0,0)},
+ verequipo(){S.mode='equipo';S.eq.via=null;S.eq.from=null;S.eq.u=null;S.eq.view='panel';S.menu=false;render();window.scrollTo(0,0)},
+ vercantina(){S.mode='equipo';S.eq.via='cantina';S.eq.from=null;S.eq.u='u3';S.eq.view='panel';S.eq.panel='cantina';S.eq.tab.cantina='ventas';S.menu=false;render();window.scrollTo(0,0)},
  eqpanel(el){S.eq.panel=el.dataset.v;S.eq.view='panel';render(true)},
  eqtab(el){S.eq.tab[el.dataset.p]=el.dataset.v;render(true)},
  eqopenpel(){S.mode='panel';S.pp='resumen';render();window.scrollTo(0,0)},
