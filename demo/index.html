@@ -475,7 +475,7 @@ i.t:empty{width:12px;height:12px}
 .eq-art{position:relative;aspect-ratio:4/3;border-radius:16px;display:grid;place-items:center;color:#fff}.eq-art .ic{width:44px;height:44px}
 .eq-star{position:absolute;top:8px;left:8px;padding:3px 10px;border-radius:99px;background:var(--dorado);color:var(--marino);font-size:.72rem;font-weight:800}
 .tbl select{padding:.5em .6em;border:2px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);min-width:120px}
-@media (max-width:700px){.eq-un{display:none}.eq-who{min-width:130px}}
+
 .eq-toyhead{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.eq-toyhead img{border-radius:50%;background:#fff;border:3px solid var(--ink);flex:none}.eq-toyhead h2{margin:0 0 4px}.eq-toyhead p{margin:0}
 
 .eq-evs{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
@@ -484,6 +484,16 @@ i.t:empty{width:12px;height:12px}
 .eq-cons{list-style:none;margin:10px 0;padding:0;display:grid;gap:4px;font-size:.9rem}
 .eq-cons li{display:flex;justify-content:space-between;gap:10px}
 .eq-ev select,.eq-ev input{min-width:0}
+
+.panel.one{grid-template-columns:minmax(0,1fr)}
+.eq-vista{display:flex;gap:10px;align-items:flex-start;background:var(--info-bg);color:var(--info);border:2px dashed var(--line);border-radius:16px;padding:12px 16px;margin-bottom:16px;font-size:.92rem}
+.eq-vista .ic{flex:none;margin-top:2px}
+.eq-evs{grid-template-columns:minmax(0,1fr)}
+.eq-ev{display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,1.3fr) minmax(0,1.2fr);gap:12px 24px;align-items:center}
+.eq-ev-a{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.eq-ev-c{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.eq-ev-c select{width:auto}
+@media (max-width:900px){.eq-ev{grid-template-columns:minmax(0,1fr)}.eq-ev-c{justify-content:flex-start}}
 
 </style>
 </head>
@@ -777,14 +787,14 @@ function modal(title,body,wide){
 
 /* ---------- encabezados ---------- */
 function demoBar(){
- return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="vercantina" aria-pressed="'+(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina')+'">Cantina</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo'&&!(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina'))+'">Equipo · próxima etapa</button></span></div></div>';
+ return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="vercantina" aria-pressed="'+(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina')+'">Cantina</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo'&&!(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina'))+'">Equipo</button></span></div></div>';
 }
 function themeBtn(){return '<button class="icon-btn" data-act="theme" aria-label="Cambiar a modo '+(isDark()?'claro':'oscuro')+'">'+ico(isDark()?'sun':'moon')+'</button>'}
 function topbar(){
  const logo='<button class="logo" data-act="go" data-v="inicio" aria-label="BenTom Universo de Aventuras, ir al inicio"><img src="'+IMG.logo.src+'" alt="" width="52" height="52"><span><b>BenTom</b><small>Universo de Aventuras</small></span></button>';
  if(S.mode==='equipo'){
   const u=S.eq.u?S.eq.users.find(x=>x.id===S.eq.u):null;
-  return '<header class="top"><div class="wrap" style="max-width:1760px">'+logo+'<span class="pill p-info" style="margin-left:6px">Panel del equipo</span><div class="row" style="margin-left:auto;gap:10px">'+(u?'<span class="muted eq-un" style="font-size:.85rem">'+esc(u.n)+'</span><button class="btn xs suave" data-act="eqlogout">Salir</button>':'')+themeBtn()+'</div></div></header>';
+  return '<header class="top"><div class="wrap" style="max-width:1760px">'+logo+'<span class="pill p-info" style="margin-left:6px">Panel del equipo</span><div class="row" style="margin-left:auto;gap:10px">'+(u?'<b class="eq-un" style="font-size:.9rem">'+esc(u.n)+'</b><button class="btn xs suave" data-act="eqlogout">Salir</button>':'')+themeBtn()+'</div></div></header>';
  }
  if(S.mode==='panel'){
   const un=unread();
@@ -1574,7 +1584,7 @@ const eqDigits=s=>String(s).replace(/\D/g,'');
 const eqById=id=>S.eq.users.find(x=>x.id===id);
 const eqProv=id=>S.eq.cant.prov.find(x=>x.id===id);
 const stPill=p=>p.stock<=0?'<span class="pill p-bad">Sin stock</span>':p.stock<p.min?'<span class="pill p-warn">Stock bajo</span>':'<span class="pill p-ok">Stock bien</span>';
-const eqNote=()=>'<div class="eq-note">'+ico('info')+'<div><b>Vista previa de una etapa posterior.</b> Esta parte no está incluida en la etapa 1 y se presupuesta aparte. Todo lo que ves es de ejemplo: nada se guarda al recargar.</div></div>';
+const eqNote=()=>'';
 
 function vEquipo(){
  const E=S.eq;
@@ -1584,9 +1594,10 @@ function vEquipo(){
  const ps=eqPanels();
  if(!ps.find(x=>x[0]===E.panel))E.panel=ps[0]?ps[0][0]:'pelotero';
  const body={pelotero:vEqPelotero,cantina:vCantina,jug:vJug,acc:vAccesos}[E.panel]();
- return eqNote()+'<div class="panel"><nav class="side" aria-label="Paneles del equipo"><p class="eq-who"><b>'+esc(u.n)+'</b><small>'+esc(eqRole(u))+'</small></p>'+
-  ps.map(x=>'<button data-act="eqpanel" data-v="'+x[0]+'"'+(E.panel===x[0]?' aria-current="page"':'')+'>'+ico(x[2])+'<span>'+x[1]+'</span></button>').join('')+
-  '<button data-act="eqlogout" class="eq-out">'+ico('lock')+'<span>Salir</span></button></nav><section aria-live="polite">'+body+'</section></div>';
+ const lv=eqLv(u,E.panel),pn=(ps.find(x=>x[0]===E.panel)||[])[1]||'',one=ps.length<2;
+ const vista=u.admin?'':'<div class="eq-vista" role="note">'+ico('info')+'<div><b>Vista de '+(lv==='enc'?'Encargado/a':'Mostrador')+' · '+esc(pn)+'.</b> Así ve este panel '+(lv==='enc'?'quien tiene acceso de encargado/a':'el personal de mostrador')+'. Esta vista no se puede cambiar desde acá: la define el administrador, que ve todo.</div></div>';
+ return '<div class="panel'+(one?' one':'')+'">'+(one?'':'<nav class="side" aria-label="Paneles del equipo">'+
+  ps.map(x=>'<button data-act="eqpanel" data-v="'+x[0]+'"'+(E.panel===x[0]?' aria-current="page"':'')+'>'+ico(x[2])+'<span>'+x[1]+'</span></button>').join('')+'</nav>')+'<section aria-live="polite">'+vista+body+'</section></div>';
 }
 
 /* ---- ingreso con Google ---- */
@@ -1633,11 +1644,11 @@ function cEventos(){
  const bar='<div class="pc-h"><div><h3>Eventos del día</h3><span class="muted" style="font-size:.85rem">'+esc(fdate(f,true))+(f===CANT_HOY?' · hoy':'')+' · vienen de las reservas confirmadas</span></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn xs suave" data-act="eqdia" data-d="-1" aria-label="Día anterior"'+(f<=CANT_HOY?' disabled':'')+'>‹</button><input type="date" value="'+f+'" min="'+CANT_HOY+'" data-chg="eqdiaset" aria-label="Elegir el día"><button class="btn xs suave" data-act="eqdia" data-d="1" aria-label="Día siguiente">›</button>'+(f!==CANT_HOY?'<button class="link" data-act="eqdia" data-d="0">Volver a hoy</button>':'')+'</div></div>';
  const cards=evs.map(e=>{
   const c=E.cuentas[e.id]||{items:[],cerrada:false,medio:'efectivo'},t=cCtotal(c),sel=E.evento===e.id;
-  return '<div class="eq-ev'+(sel?' sel':'')+'"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><div><b>'+esc(evTit(e))+'</b><br><small class="muted">'+esc(turnoDe(e.turno).n)+' · '+esc(hrs(e.fecha,e.turno))+' · '+esc(COMBOS.find(x=>x.id===e.combo).n)+'</small></div>'+(c.cerrada?'<span class="pill p-ok">Cobrada</span>':'<span class="pill p-info">Cuenta abierta</span>')+'</div>'+
-  (c.items.length?'<ul class="eq-cons">'+c.items.map(i=>'<li><span>'+i.q+' × '+esc(i.n)+'</span><span class="tnum">'+money(i.q*i.precio)+'</span></li>').join('')+'</ul>':'<p class="muted" style="margin:10px 0">Todavía no consumieron nada.</p>')+
-  '<div class="row" style="justify-content:space-between"><b>Consumo</b><b class="tnum">'+money(t)+'</b></div>'+
-  (c.cerrada?'<p class="hint" style="margin:8px 0 0">Cobrada con '+esc(c.medio)+'. La cuenta quedó cerrada.</p>':
-   '<div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn xs'+(sel?'':' suave')+'" data-act="eqcargar" data-id="'+e.id+'" aria-pressed="'+sel+'">'+(sel?'Cargando a este evento':'Cargar consumo')+'</button>'+medioSel(e.id,c.medio)+'<button class="btn xs" data-act="eqcobrarev" data-id="'+e.id+'"'+(c.items.length?'':' disabled')+'>Cobrar al finalizar</button></div>')+'</div>'}).join('');
+  return '<div class="eq-ev'+(sel?' sel':'')+'"><div class="eq-ev-a"><b>'+esc(evTit(e))+'</b><small class="muted">'+esc(turnoDe(e.turno).n)+' · '+esc(hrs(e.fecha,e.turno))+' · '+esc(COMBOS.find(x=>x.id===e.combo).n)+'</small><span>'+(c.cerrada?'<span class="pill p-ok">Cobrada</span>':'<span class="pill p-info">Cuenta abierta</span>')+'</span></div>'+
+  '<div class="eq-ev-b">'+(c.items.length?'<ul class="eq-cons">'+c.items.map(i=>'<li><span>'+i.q+' × '+esc(i.n)+'</span><span class="tnum">'+money(i.q*i.precio)+'</span></li>').join('')+'</ul>':'<p class="muted" style="margin:0 0 8px">Todavía no consumieron nada.</p>')+
+  '<div class="row" style="justify-content:space-between"><b>Consumo</b><b class="tnum">'+money(t)+'</b></div></div>'+
+  '<div class="eq-ev-c">'+(c.cerrada?'<p class="hint" style="margin:0">Cobrada con '+esc(c.medio)+'. La cuenta quedó cerrada.</p>':
+   '<button class="btn xs'+(sel?'':' suave')+'" data-act="eqcargar" data-id="'+e.id+'" aria-pressed="'+sel+'">'+(sel?'Cargando a este evento':'Cargar consumo')+'</button>'+medioSel(e.id,c.medio)+'<button class="btn xs" data-act="eqcobrarev" data-id="'+e.id+'"'+(c.items.length?'':' disabled')+'>Cobrar al finalizar</button>')+'</div></div>'}).join('');
  return '<div class="pc" style="margin-bottom:18px">'+bar+(evs.length?'<div class="eq-evs">'+cards+'</div>':'<p class="muted">No hay eventos reservados para este día. Igual podés vender en el mostrador.</p>')+'</div>';
 }
 function cVentas(){
@@ -1708,7 +1719,7 @@ function toysHome(){
  const d=toyDest().slice(0,4);
  return '<section class="sec alt"><div class="wrap"><div class="eq-toyhead"><img src="'+TOYS_LOGO+'" alt="Ben Toys by BenTom" width="96" height="96"><div><h2>Ben Toys, la juguetería de BenTom</h2><p>Regalos y juguetes para llevarte después del festejo. Algunos destacados:</p></div></div>'+
  (d.length?'<div class="eq-grid">'+d.map(toyTile).join('')+'</div>':'')+
- '<div class="row" style="margin-top:18px"><button class="btn naranja" data-act="go" data-v="tienda">Ir a la tienda</button><span class="pill p-info">Vista previa de la próxima etapa</span></div></div></section>';
+ '<div class="row" style="margin-top:18px"><button class="btn naranja" data-act="go" data-v="tienda">Ir a la tienda</button></div></div></section>';
 }
 /* pagina publica de la tienda (dentro del sitio del pelotero) */
 function vTienda(){
@@ -1744,7 +1755,7 @@ Object.assign(ACT,{
  eqgoogle(){toast('En el sitio real se abre Google para elegir tu cuenta. En la demo, elegí con quién ingresar abajo.','info')},
  eqlogin(el){S.eq.u=el.dataset.u;S.eq.view='panel';const u=eqMe();if(u.est==='activo'){const p=eqPanels()[0];S.eq.panel=p?p[0]:'pelotero';S.eq.tab={cantina:'ventas',jug:'productos'}}render();window.scrollTo(0,0)},
  eqlogout(){S.eq.u=null;S.eq.view='panel';S.eq.cart={};render();window.scrollTo(0,0)},
- vercantina(){S.mode='equipo';S.eq.from=null;S.eq.u='u1';S.eq.view='panel';S.eq.panel='cantina';S.eq.tab.cantina='ventas';S.menu=false;render();window.scrollTo(0,0)},
+ vercantina(){S.mode='equipo';S.eq.from=null;S.eq.u='u3';S.eq.view='panel';S.eq.panel='cantina';S.eq.tab.cantina='ventas';S.menu=false;render();window.scrollTo(0,0)},
  eqpanel(el){S.eq.panel=el.dataset.v;S.eq.view='panel';render(true)},
  eqtab(el){S.eq.tab[el.dataset.p]=el.dataset.v;render(true)},
  eqopenpel(){S.mode='panel';S.pp='resumen';render();window.scrollTo(0,0)},
