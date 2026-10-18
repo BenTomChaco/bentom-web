@@ -478,6 +478,13 @@ i.t:empty{width:12px;height:12px}
 @media (max-width:700px){.eq-un{display:none}.eq-who{min-width:130px}}
 .eq-toyhead{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.eq-toyhead img{border-radius:50%;background:#fff;border:3px solid var(--ink);flex:none}.eq-toyhead h2{margin:0 0 4px}.eq-toyhead p{margin:0}
 
+.eq-evs{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.eq-ev{border:2px solid var(--line);border-radius:16px;padding:14px;background:var(--surface)}
+.eq-ev.sel{border-color:var(--hot)}
+.eq-cons{list-style:none;margin:10px 0;padding:0;display:grid;gap:4px;font-size:.9rem}
+.eq-cons li{display:flex;justify-content:space-between;gap:10px}
+.eq-ev select,.eq-ev input{min-width:0}
+
 </style>
 </head>
 <body>
@@ -770,7 +777,7 @@ function modal(title,body,wide){
 
 /* ---------- encabezados ---------- */
 function demoBar(){
- return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel. <button class="link" style="color:#fff;font-weight:700" data-act="vercantina">Ver cómo será el control de Cantina →</button></span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo')+'">Equipo · próxima etapa</button></span></div></div>';
+ return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="vercantina" aria-pressed="'+(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina')+'">Cantina</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo'&&!(S.mode==='equipo'&&S.eq.u&&S.eq.view==='panel'&&S.eq.panel==='cantina'))+'">Equipo · próxima etapa</button></span></div></div>';
 }
 function themeBtn(){return '<button class="icon-btn" data-act="theme" aria-label="Cambiar a modo '+(isDark()?'claro':'oscuro')+'">'+ico(isDark()?'sun':'moon')+'</button>'}
 function topbar(){
@@ -1512,7 +1519,7 @@ const LVL={no:'Sin acceso',mos:'Mostrador',enc:'Encargado'};
 const GICON='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
 const TOYS_I=['#2B3990','#FF8200','#17794D','#B3261E','#F5B71A','#6B3FA0'];
 
-S.eq={u:null,panel:'cantina',view:'panel',tab:{cantina:'ventas',jug:'productos'},cart:{},medio:'efectivo',evento:'',jcat:'Todos',cajaOk:false,
+S.eq={u:null,panel:'cantina',view:'panel',tab:{cantina:'ventas',jug:'productos'},cart:{},medio:'efectivo',evento:'',cdia:'2026-10-17',cuentas:{'EV-0421':{items:[{id:'p1',n:'Gaseosa 500 ml',q:4,precio:2200},{id:'p3',n:'Agua mineral',q:6,precio:1500}],cerrada:false,medio:'efectivo'}},jcat:'Todos',cajaOk:false,
  users:[
   {id:'u1',n:'Ana Benítez',mail:'ana.demo@gmail.com',est:'activo',admin:true,acc:{pelotero:'enc',cantina:'enc',jug:'enc'}},
   {id:'u2',n:'Lucía Romero',mail:'lucia.demo@gmail.com',est:'activo',acc:{pelotero:'enc',cantina:'enc',jug:'mos'}},
@@ -1614,17 +1621,37 @@ function vCantina(){
  return pHead('Cantina del pelotero')+'<div class="tabs" role="tablist">'+tabs.map(x=>'<button class="chip" role="tab" data-act="eqtab" data-p="cantina" data-v="'+x[0]+'" aria-pressed="'+(t===x[0])+'">'+x[1]+'</button>').join('')+'</div>'+body;
 }
 function cTotal(){return Object.keys(S.eq.cart).reduce((s,id)=>{const p=S.eq.cant.prod.find(x=>x.id===id);return s+(p?p.precio*S.eq.cart[id]:0)},0)}
+const CANT_HOY='2026-10-17';
+const cEvDia=f=>EV.filter(e=>e.fecha===f&&e.estado==='confirmada').sort((a,b)=>a.turno.localeCompare(b.turno));
+const cCuenta=id=>{const c=S.eq.cuentas;return c[id]||(c[id]={items:[],cerrada:false,medio:'efectivo'})};
+const cCtotal=c=>c.items.reduce((s,i)=>s+i.q*i.precio,0);
+const evTit=e=>(e.cumple.n||'Evento')+' · '+nameOf(e);
+const MEDIOS=['efectivo','transferencia','débito','crédito'];
+const medioSel=(id,m)=>'<select data-chg="eqevmedio" data-id="'+id+'" aria-label="Forma de pago del evento">'+MEDIOS.map(x=>'<option value="'+x+'"'+(m===x?' selected':'')+'>'+x[0].toUpperCase()+x.slice(1)+'</option>').join('')+'</select>';
+function cEventos(){
+ const E=S.eq,f=E.cdia,evs=cEvDia(f);
+ const bar='<div class="pc-h"><div><h3>Eventos del día</h3><span class="muted" style="font-size:.85rem">'+esc(fdate(f,true))+(f===CANT_HOY?' · hoy':'')+' · vienen de las reservas confirmadas</span></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn xs suave" data-act="eqdia" data-d="-1" aria-label="Día anterior"'+(f<=CANT_HOY?' disabled':'')+'>‹</button><input type="date" value="'+f+'" min="'+CANT_HOY+'" data-chg="eqdiaset" aria-label="Elegir el día"><button class="btn xs suave" data-act="eqdia" data-d="1" aria-label="Día siguiente">›</button>'+(f!==CANT_HOY?'<button class="link" data-act="eqdia" data-d="0">Volver a hoy</button>':'')+'</div></div>';
+ const cards=evs.map(e=>{
+  const c=E.cuentas[e.id]||{items:[],cerrada:false,medio:'efectivo'},t=cCtotal(c),sel=E.evento===e.id;
+  return '<div class="eq-ev'+(sel?' sel':'')+'"><div class="row" style="justify-content:space-between;gap:8px;align-items:flex-start"><div><b>'+esc(evTit(e))+'</b><br><small class="muted">'+esc(turnoDe(e.turno).n)+' · '+esc(hrs(e.fecha,e.turno))+' · '+esc(COMBOS.find(x=>x.id===e.combo).n)+'</small></div>'+(c.cerrada?'<span class="pill p-ok">Cobrada</span>':'<span class="pill p-info">Cuenta abierta</span>')+'</div>'+
+  (c.items.length?'<ul class="eq-cons">'+c.items.map(i=>'<li><span>'+i.q+' × '+esc(i.n)+'</span><span class="tnum">'+money(i.q*i.precio)+'</span></li>').join('')+'</ul>':'<p class="muted" style="margin:10px 0">Todavía no consumieron nada.</p>')+
+  '<div class="row" style="justify-content:space-between"><b>Consumo</b><b class="tnum">'+money(t)+'</b></div>'+
+  (c.cerrada?'<p class="hint" style="margin:8px 0 0">Cobrada con '+esc(c.medio)+'. La cuenta quedó cerrada.</p>':
+   '<div class="row" style="gap:8px;margin-top:12px;flex-wrap:wrap"><button class="btn xs'+(sel?'':' suave')+'" data-act="eqcargar" data-id="'+e.id+'" aria-pressed="'+sel+'">'+(sel?'Cargando a este evento':'Cargar consumo')+'</button>'+medioSel(e.id,c.medio)+'<button class="btn xs" data-act="eqcobrarev" data-id="'+e.id+'"'+(c.items.length?'':' disabled')+'>Cobrar al finalizar</button></div>')+'</div>'}).join('');
+ return '<div class="pc" style="margin-bottom:18px">'+bar+(evs.length?'<div class="eq-evs">'+cards+'</div>':'<p class="muted">No hay eventos reservados para este día. Igual podés vender en el mostrador.</p>')+'</div>';
+}
 function cVentas(){
  const E=S.eq,C=E.cant,ids=Object.keys(E.cart);
- const evs=fut().slice(0,5);
- return '<div class="eq-pos"><div class="pc"><div class="pc-h"><h3>Tocá para sumar</h3><span class="muted" style="font-size:.85rem">Desde el celular o la computadora del mostrador</span></div><div class="eq-prods">'+
+ const evs=cEvDia(E.cdia).filter(e=>!(E.cuentas[e.id]||{}).cerrada);
+ if(E.evento&&!evs.find(e=>e.id===E.evento))E.evento='';
+ return cEventos()+'<div class="eq-pos"><div class="pc"><div class="pc-h"><h3>Tocá para sumar</h3><span class="muted" style="font-size:.85rem">Desde el celular o la computadora del mostrador</span></div><div class="eq-prods">'+
  C.prod.filter(p=>p.on).map(p=>'<button class="eq-prod" data-act="eqadd" data-id="'+p.id+'"'+(p.stock<=0?' disabled':'')+'><b>'+esc(p.n)+'</b><span class="tnum">'+money(p.precio)+'</span><small>'+(p.stock<=0?'Sin stock':'Quedan '+p.stock)+'</small></button>').join('')+'</div></div>'+
  '<div class="pc"><div class="pc-h"><h3>Cuenta actual</h3>'+(ids.length?'<button class="link" data-act="eqclear">Vaciar</button>':'')+'</div>'+
  (ids.length?ids.map(id=>{const p=C.prod.find(x=>x.id===id);return '<div class="li"><div class="tx"><b>'+esc(p.n)+'</b><small class="tnum">'+money(p.precio)+' c/u</small></div><div class="row" style="gap:6px"><button class="icon-btn" data-act="eqqty" data-id="'+id+'" data-d="-1" aria-label="Quitar uno de '+esc(p.n)+'">−</button><b class="tnum">'+E.cart[id]+'</b><button class="icon-btn" data-act="eqqty" data-id="'+id+'" data-d="1" aria-label="Sumar uno de '+esc(p.n)+'">+</button></div></div>'}).join(''):'<p class="muted">Todavía no sumaste nada.</p>')+
  '<div class="field"><label for="eqm">Forma de pago</label><select id="eqm" data-chg="eqmedio"><option value="efectivo"'+(E.medio==='efectivo'?' selected':'')+'>Efectivo</option><option value="transferencia"'+(E.medio==='transferencia'?' selected':'')+'>Transferencia</option><option value="débito"'+(E.medio==='débito'?' selected':'')+'>Débito</option><option value="crédito"'+(E.medio==='crédito'?' selected':'')+'>Crédito</option></select></div>'+
- '<div class="field"><label for="eqe">¿A quién se le carga?</label><select id="eqe" data-chg="eqevento"><option value="">Venta de mostrador</option>'+evs.map(e=>'<option value="'+e.id+'"'+(E.evento===e.id?' selected':'')+'>Al evento de '+esc(e.cumple.n||nameOf(e))+' · '+esc(fshort(e.fecha).slice(0,5))+'</option>').join('')+'</select></div>'+
+ '<div class="field"><label for="eqe">¿A quién se le carga?</label><select id="eqe" data-chg="eqevento"><option value="">Venta de mostrador</option>'+evs.map(e=>'<option value="'+e.id+'"'+(E.evento===e.id?' selected':'')+'>Cuenta del evento: '+esc(evTit(e))+'</option>').join('')+'</select></div>'+
  '<div class="row" style="justify-content:space-between"><b>Total</b><b class="money-t tnum" style="font-size:1.4rem">'+money(cTotal())+'</b></div>'+
- '<button class="btn" data-act="eqcobrar"'+(ids.length?'':' disabled')+'>Cobrar y descontar stock</button></div></div>';
+ (E.evento?'<p class="hint" style="margin:0">Se suma a la cuenta del evento y se cobra al finalizar el horario.</p>':'')+'<button class="btn" data-act="eqcobrar"'+(ids.length?'':' disabled')+'>'+(E.evento?'Cargar a la cuenta del evento':'Cobrar y descontar stock')+'</button></div></div>';
 }
 function cProductos(){
  const C=S.eq.cant;
@@ -1729,10 +1756,23 @@ Object.assign(ACT,{
  eqcobrar(){const E=S.eq,C=E.cant,ids=Object.keys(E.cart);if(!ids.length)return;
   const items=ids.map(id=>{const p=C.prod.find(x=>x.id===id);p.stock-=E.cart[id];return E.cart[id]+' × '+p.n}).join(', ');const total=cTotal();
   const ev=E.evento?evById(E.evento):null;
-  C.ventas.push({t:p2(simNow().getHours())+':'+p2(simNow().getMinutes()),q:eqMe().id,n:eqMe().n,items,total,medio:E.medio,ev:E.evento});
-  eqLog('Registró una venta de cantina de '+money(total)+(ev?' cargada al evento '+E.evento:''));
-  toast(ev?'Cobrado. Se sumó a las cuentas claras del evento de '+(ev.cumple.n||nameOf(ev))+'.':'Cobrado '+money(total)+'. El stock ya se descontó.','ok');
-  E.cart={};E.evento='';render(true)},
+  if(ev){const c=cCuenta(ev.id);ids.forEach(id=>{const p=C.prod.find(x=>x.id===id),it=c.items.find(x=>x.id===id);if(it)it.q+=E.cart[id];else c.items.push({id,n:p.n,q:E.cart[id],precio:p.precio})});
+   eqLog('Cargó '+money(total)+' a la cuenta del evento de '+evTit(ev));
+   toast('Cargado a la cuenta del evento de '+(ev.cumple.n||nameOf(ev))+'. Se cobra al finalizar.','ok');E.cart={};render(true);return}
+  C.ventas.push({t:p2(simNow().getHours())+':'+p2(simNow().getMinutes()),q:eqMe().id,n:eqMe().n,items,total,medio:E.medio,ev:''});
+  eqLog('Registró una venta de cantina de '+money(total));
+  toast('Cobrado '+money(total)+'. El stock ya se descontó.','ok');
+  E.cart={};render(true)},
+ eqdia(el){const E=S.eq,d=Number(el.dataset.d);let f=CANT_HOY;if(d!==0){f=iso(new Date(parse(E.cdia).getTime()+d*864e5+36e5));if(f<CANT_HOY)f=CANT_HOY}E.cdia=f;E.evento='';render(true)},
+ eqdiaset(el){const E=S.eq;let f=el.value;if(!f||f<CANT_HOY)f=CANT_HOY;E.cdia=f;E.evento='';render(true)},
+ eqcargar(el){S.eq.evento=S.eq.evento===el.dataset.id?'':el.dataset.id;render(true)},
+ eqevmedio(el){cCuenta(el.dataset.id).medio=el.value},
+ eqcobrarev(el){const E=S.eq,ev=evById(el.dataset.id),c=cCuenta(el.dataset.id);if(!c.items.length||c.cerrada)return;
+  const total=cCtotal(c);
+  E.cant.ventas.push({t:p2(simNow().getHours())+':'+p2(simNow().getMinutes()),q:eqMe().id,n:eqMe().n,items:c.items.map(i=>i.q+' × '+i.n).join(', '),total,medio:c.medio,ev:ev.id});
+  c.cerrada=true;if(E.evento===ev.id)E.evento='';
+  eqLog('Cobró la cuenta del evento de '+evTit(ev)+' ('+money(total)+')');
+  toast('Cuenta cobrada: '+money(total)+' con '+c.medio+'. Queda en la caja.','ok');render(true)},
  eqprice(el){const p=S.eq.cant.prod[Number(el.dataset.i)];const v=Math.max(0,Number(el.value)||0);p[el.dataset.f]=v;eqLog('Cambió '+(el.dataset.f==='costo'?'el costo':'el precio')+' de '+p.n+' a '+money(v));toast('Cambio guardado. Queda en el registro de actividad.','ok');render(true)},
  eqon(el){const p=S.eq.cant.prod[Number(el.dataset.i)];p.on=el.checked;eqLog((p.on?'Volvió a vender ':'Dejó de vender ')+p.n);render(true)},
  eqstock(el){const p=S.eq.cant.prod.find(x=>x.id===el.dataset.id);p.stock+=Number(el.dataset.n);eqLog('Subió el stock de '+p.n+' (+'+el.dataset.n+')');toast('Stock de '+p.n+': '+p.stock,'ok');render(true)},
