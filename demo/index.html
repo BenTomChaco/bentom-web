@@ -495,6 +495,23 @@ i.t:empty{width:12px;height:12px}
 .eq-ev-c select{width:auto}
 @media (max-width:900px){.eq-ev{grid-template-columns:minmax(0,1fr)}.eq-ev-c{justify-content:flex-start}}
 
+/* selectores con los colores del sitio */
+:root{--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231A1F5C' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");--cal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231A1F5C' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23F5B71A' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");--cal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23F5B71A' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E")}}
+:root[data-theme="dark"]{--chev:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23F5B71A' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");--cal:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23F5B71A' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E")}
+.panel select,.eq-ev select{appearance:none;-webkit-appearance:none;font:inherit;font-weight:600;font-size:.88rem;color:var(--fg);background:var(--surface) var(--chev) no-repeat right 12px center;border:2px solid var(--line);border-radius:999px;padding:.5em 2.2em .5em 1em;min-height:40px;cursor:pointer;box-shadow:2px 2px 0 var(--line)}
+.panel .field select{font-weight:500;font-size:1rem;border-radius:14px;box-shadow:none;min-height:0;padding:.7em 2.4em .7em .9em}
+.panel .tbl select{border-radius:12px;box-shadow:none}
+.panel select:hover,.eq-ev select:hover{border-color:var(--prim)}
+.panel select:focus-visible,.eq-ev select:focus-visible,.eq-date input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.panel select option{background:var(--surface);color:var(--fg)}
+.eq-date{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:3px 4px;box-shadow:2px 2px 0 var(--line)}
+.eq-date .btn{border-radius:999px;min-width:34px;padding-inline:0;box-shadow:none}
+.eq-date input[type=date]{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--fg);font:inherit;font-weight:700;font-size:.9rem;padding:.35em .4em;min-width:0;width:9.5em;text-align:center;cursor:pointer}
+.eq-date input[type=date]::-webkit-calendar-picker-indicator{background:var(--cal) no-repeat center;background-size:18px;width:20px;height:20px;cursor:pointer;opacity:1}
+.eq-date input[type=date]::-webkit-datetime-edit{padding:0}
+.eq-hoy{border-radius:999px}
+
 </style>
 </head>
 <body>
@@ -1641,7 +1658,7 @@ const MEDIOS=['efectivo','transferencia','débito','crédito'];
 const medioSel=(id,m)=>'<select data-chg="eqevmedio" data-id="'+id+'" aria-label="Forma de pago del evento">'+MEDIOS.map(x=>'<option value="'+x+'"'+(m===x?' selected':'')+'>'+x[0].toUpperCase()+x.slice(1)+'</option>').join('')+'</select>';
 function cEventos(){
  const E=S.eq,f=E.cdia,evs=cEvDia(f);
- const bar='<div class="pc-h"><div><h3>Eventos del día</h3><span class="muted" style="font-size:.85rem">'+esc(fdate(f,true))+(f===CANT_HOY?' · hoy':'')+' · vienen de las reservas confirmadas</span></div><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn xs suave" data-act="eqdia" data-d="-1" aria-label="Día anterior"'+(f<=CANT_HOY?' disabled':'')+'>‹</button><input type="date" value="'+f+'" min="'+CANT_HOY+'" data-chg="eqdiaset" aria-label="Elegir el día"><button class="btn xs suave" data-act="eqdia" data-d="1" aria-label="Día siguiente">›</button>'+(f!==CANT_HOY?'<button class="link" data-act="eqdia" data-d="0">Volver a hoy</button>':'')+'</div></div>';
+ const bar='<div class="pc-h"><div><h3>Eventos del día</h3><span class="muted" style="font-size:.85rem">'+esc(fdate(f,true))+(f===CANT_HOY?' · hoy':'')+' · vienen de las reservas confirmadas</span></div><div class="row" style="gap:8px;flex-wrap:wrap"><div class="eq-date" role="group" aria-label="Día de la cantina"><button class="btn xs suave" data-act="eqdia" data-d="-1" aria-label="Día anterior"'+(f<=CANT_HOY?' disabled':'')+'>'+ico('chevL')+'</button><input type="date" value="'+f+'" min="'+CANT_HOY+'" data-chg="eqdiaset" aria-label="Elegir el día"><button class="btn xs suave" data-act="eqdia" data-d="1" aria-label="Día siguiente">'+ico('chevR')+'</button></div>'+(f!==CANT_HOY?'<button class="btn xs eq-hoy" data-act="eqdia" data-d="0">Volver a hoy</button>':'')+'</div></div>';
  const cards=evs.map(e=>{
   const c=E.cuentas[e.id]||{items:[],cerrada:false,medio:'efectivo'},t=cCtotal(c),sel=E.evento===e.id;
   return '<div class="eq-ev'+(sel?' sel':'')+'"><div class="eq-ev-a"><b>'+esc(evTit(e))+'</b><small class="muted">'+esc(turnoDe(e.turno).n)+' · '+esc(hrs(e.fecha,e.turno))+' · '+esc(COMBOS.find(x=>x.id===e.combo).n)+'</small><span>'+(c.cerrada?'<span class="pill p-ok">Cobrada</span>':'<span class="pill p-info">Cuenta abierta</span>')+'</span></div>'+
