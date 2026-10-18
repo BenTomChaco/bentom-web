@@ -770,7 +770,7 @@ function modal(title,body,wide){
 
 /* ---------- encabezados ---------- */
 function demoBar(){
- return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel.</span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo')+'">Equipo · próxima etapa</button></span></div></div>';
+ return '<div class="demo-bar"><div class="wrap"><span>Demo con datos de ejemplo. El dueño cambia precios, turnos, textos y pagos desde su panel. <button class="link" style="color:#fff;font-weight:700" data-act="vercantina">Ver cómo será el control de Cantina →</button></span><span class="seg" role="group" aria-label="Cambiar vista de la demo"><button data-act="mode" data-v="sitio" aria-pressed="'+(S.mode==='sitio')+'">Sitio para clientes</button><button data-act="mode" data-v="panel" aria-pressed="'+(S.mode==='panel')+'">Panel del dueño</button><button data-act="mode" data-v="equipo" aria-pressed="'+(S.mode==='equipo')+'">Equipo · próxima etapa</button></span></div></div>';
 }
 function themeBtn(){return '<button class="icon-btn" data-act="theme" aria-label="Cambiar a modo '+(isDark()?'claro':'oscuro')+'">'+ico(isDark()?'sun':'moon')+'</button>'}
 function topbar(){
@@ -783,7 +783,7 @@ function topbar(){
   const un=unread();
   return '<header class="top"><div class="wrap" style="max-width:1760px">'+logo+'<span class="pill p-info" style="margin-left:6px">Panel del dueño</span><div class="row" style="margin-left:auto;gap:10px"><span class="rel"><button class="icon-btn" data-act="notif" aria-label="Notificaciones, '+un+' sin leer" aria-expanded="'+S.notif+'">'+ico('bell')+(un?'<span class="badge">'+un+'</span>':'')+'</button>'+(S.notif?notifBox():'')+'</span>'+themeBtn()+'<button class="btn sm suave" data-act="mode" data-v="sitio">Ver el sitio</button></div></div></header>';
  }
- const items=[['inicio','Inicio'],['combos','Combos'],['galeria','El salón'],['tienda','Ben Toys'],['faq','Preguntas'],['cuenta','Mi reserva']];
+ const items=[['inicio','Inicio'],['combos','Combos'],['galeria','El salón'],['faq','Preguntas'],['cuenta','Mi reserva']];
  return '<header class="top"><div class="wrap">'+logo+'<button class="icon-btn burger" data-act="menu" aria-label="Menú" aria-expanded="'+S.menu+'">'+ico('menu')+'</button><nav class="nav'+(S.menu?' open':'')+'" aria-label="Principal">'+items.map(i=>'<button class="nl" data-act="go" data-v="'+i[0]+'"'+(S.page===i[0]?' aria-current="page"':'')+'>'+i[1]+'</button>').join('')+'<button class="btn sm" data-act="go" data-v="reservar">Reservar turno</button>'+themeBtn()+'</nav></div></header>';
 }
 function notifBox(){
@@ -796,7 +796,7 @@ function footer(){
  '<div><h4>Dónde estamos</h4><p>'+esc(CFG.direccion)+'</p><p style="margin-top:8px"><a href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(CFG.direccion)+'" target="_blank" rel="noopener" style="color:var(--dorado);font-weight:600">Cómo llegar</a></p></div>'+
  '<div><h4>Reservas</h4><p>WhatsApp: '+esc(CFG.sena.wa)+'</p><p>'+esc(CFG.sena.mail)+'</p><p class="muted" style="margin-top:6px;font-size:.78rem">Datos de contacto de ejemplo.</p></div>'+
  (redesOn().length?'<div><h4>Seguinos</h4><p>Mirá fotos de los festejos y las novedades.</p>'+socHtml()+'</div>':'')+
- '<div><h4>Para el cliente</h4><ul><li><button class="link" style="color:#fff" data-act="go" data-v="reservar">Reservar un turno</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="cuenta">Ver mi reserva y mi saldo</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="tienda">Tienda Ben Toys</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="faq">Preguntas frecuentes</button></li></ul></div></div>'+
+ '<div><h4>Para el cliente</h4><ul><li><button class="link" style="color:#fff" data-act="go" data-v="reservar">Reservar un turno</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="cuenta">Ver mi reserva y mi saldo</button></li><li><button class="link" style="color:#fff" data-act="go" data-v="faq">Preguntas frecuentes</button></li></ul></div></div>'+
  '<div class="legal">Demo de diseño. Los textos legales, precios y datos de contacto son de ejemplo y los define el dueño.</div></footer>';
 }
 
@@ -1717,6 +1717,7 @@ Object.assign(ACT,{
  eqgoogle(){toast('En el sitio real se abre Google para elegir tu cuenta. En la demo, elegí con quién ingresar abajo.','info')},
  eqlogin(el){S.eq.u=el.dataset.u;S.eq.view='panel';const u=eqMe();if(u.est==='activo'){const p=eqPanels()[0];S.eq.panel=p?p[0]:'pelotero';S.eq.tab={cantina:'ventas',jug:'productos'}}render();window.scrollTo(0,0)},
  eqlogout(){S.eq.u=null;S.eq.view='panel';S.eq.cart={};render();window.scrollTo(0,0)},
+ vercantina(){S.mode='equipo';S.eq.from=null;S.eq.u='u1';S.eq.view='panel';S.eq.panel='cantina';S.eq.tab.cantina='ventas';S.menu=false;render();window.scrollTo(0,0)},
  eqpanel(el){S.eq.panel=el.dataset.v;S.eq.view='panel';render(true)},
  eqtab(el){S.eq.tab[el.dataset.p]=el.dataset.v;render(true)},
  eqopenpel(){S.mode='panel';S.pp='resumen';render();window.scrollTo(0,0)},
